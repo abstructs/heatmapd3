@@ -64,7 +64,7 @@ var createMap = function(data) {
       .range(['blue', 'orange']);
 
   var bottomAxis = d3.axisBottom(xAxisScale).ticks(30);
-  var leftAxis = d3.axisLeft(yAxisScale).showYAxis(false);
+  var leftAxis = d3.axisLeft(yAxisScale);
 
   var map = d3.select('body').select('svg');
 
