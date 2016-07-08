@@ -1,0 +1,8 @@
+body {
+  text-align: center;
+  background-color: #6699ff;
+}
+svg {
+  margin-top: 50px;
+  box-shadow: 3px 3px 44px #000;
+}
