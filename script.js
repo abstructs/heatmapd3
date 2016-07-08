@@ -66,6 +66,10 @@ var createMap = function(data) {
   var bottomAxis = d3.axisBottom(xAxisScale).ticks(30);
   var leftAxis = d3.axisLeft(yAxisScale);
 
+  var div = d3.select("body").append("div")
+      .attr("class", "tooltip")
+      .style("opacity", 0);
+
   var map = d3.select('body').select('svg');
 
   map.attr('height', height)
@@ -86,6 +90,20 @@ var createMap = function(data) {
   .attr('width', '4px')
   .attr('fill', function(d){return color(d.variance)})
   .attr('float', 'left')
+  .on("mouseover", function(d) {
+    div.transition()
+        .duration(5)
+        .style("opacity", .9);
+    div.html(d.year + ' - ' + d.month + '</br>' + d.variance)
+        .style("left", (d3.event.pageX) + "px")
+        .style("top", (d3.event.pageY - 28) + "px");
+  })
+  .on("mouseout", function(d) {
+    div.transition()
+        .duration(200)
+        .style("opacity", 0);
+  });
+
 
   d3.select("body").select("svg")
       .append("g")

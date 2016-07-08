@@ -6,3 +6,17 @@ svg {
   margin-top: 50px;
   box-shadow: 3px 3px 44px #000;
 }
+div.tooltip {
+  position: absolute;
+  text-align: center;
+  width: auto;
+  height: auto;
+  padding: 3px 5px 3px 5px;
+  font: 1em sans-serif;
+  border: 0px;
+  border-radius: 2px;
+  pointer-events: none;
+  box-shadow: 3px 3px 44px rgba(0, 0, 0, 0.2);
+  background-color: black;
+  color: white;
+}
