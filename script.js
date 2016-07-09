@@ -9,15 +9,9 @@ var getData = function() {
    )
 
 };
-createDataSet = function() {
-  var data = [];
-  for (var i = 0; i < 75; i++) {
-    var rand = Math.floor((Math.random() * 100) + 10)
-    data.push(rand);
-  }
-  return data
-}
 var createMap = function(data) {
+  var months = ['January', 'Febuary', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'November', 'December']
+
   var margin = {top: 30, bottom: 30, right: 30, left: 30},
       height = 550 - margin.top - margin.bottom,
       width = 1100 - margin.right - margin.left;
@@ -102,7 +96,7 @@ var createMap = function(data) {
     div.transition()
         .duration(5)
         .style("opacity", .9);
-    div.html(d.year + ' - ' + d.month + '</br>' + d.variance + ' &#8451;</br>' + d.variance + data.baseTemperature + ' &#8451;')
+    div.html(d.year + ' - ' + months[d.month - 1] + '</br>' + d.variance + ' &#8451;</br>' + d.variance + data.baseTemperature + ' &#8451;')
         .style("left", (d3.event.pageX + 5) + "px")
         .style("top", (d3.event.pageY - 65) + "px");
   })
@@ -137,8 +131,10 @@ var createMap = function(data) {
   d3.select("body").select("svg")
       .append("g")
       .attr("height", height - 50)
-      .attr("transform", "translate(70)")
+      .attr("transform", "translate(69)")
       .call(leftAxis)
+      .select('path')
+      .attr('stroke', 'white')
 
   d3.select("svg").append("text")  // create the title for the graph
     .attr("x", width / 2 + 5)
