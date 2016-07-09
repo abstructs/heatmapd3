@@ -1,11 +1,13 @@
 var getData = function() {
   return $.getJSON(
     // python -m SimpleHTTPSever
-    "/global-temperature.json",
-    function(json) {
-      return json
-    }
-  )
+  //   "/global-temperature.json",
+  //   function(json) {
+  //     return json
+  //   }
+  "https://raw.githubusercontent.com/FreeCodeCamp/ProjectReferenceData/master/global-temperature.json"
+   )
+
 };
 createDataSet = function() {
   var data = [];
@@ -35,36 +37,42 @@ var createMap = function(data) {
   var maxMonth = d3.max(data.monthlyVariance, function(d){
     var date = new Date()
     date.setMonth(d.month - 1)
+    date.setDate(1)
     return date;
   }),
   minMonth = d3.min(data.monthlyVariance, function(d){
     var date = new Date()
     date.setMonth(d.month - 1)
+    date.setDate(0)
     return date;
   });
 
   var xAxisScale = d3.scaleLinear()
       .domain([minYear, maxYear])
-      .range([50, width - 85]);
-
-  var yAxisScale = d3.scaleLinear()
-      .domain([1, 12])
-      .range([50, 392]);
+      .range([50, width - 85]),
+  yAxisScale = d3.scaleTime()
+      .domain([minMonth, maxMonth])
+      .range([50, 392]),
+  legendAxisScale = d3.scaleLinear()
+      .domain([varianceMin, varianceMax])
+      .range([0, 200]);
 
   var y = d3.scaleTime()
       .domain([minMonth, maxMonth])
-      .range([50, 392]);
-
-  var x = d3.scaleTime()
+      .range([40.8, 383]),
+  x = d3.scaleTime()
       .domain([minYear, maxYear])
-      .range([70, width - 67]);
-
-  var color = d3.scaleLinear()
+      .range([70, width - 67]),
+  legendScale = d3.scaleLinear()
       .domain([varianceMin, varianceMax])
-      .range(['blue', 'orange']);
+      .range([0, 176]),
+  color = d3.scaleQuantize()
+      .domain([varianceMin, varianceMax])
+      .range(['#6600ff', '#6699ff', '#3399ff', '#33cccc', '#ccffcc', '#ffcc66', '#ff9933', '#ff6600', '#cc0000', '#800000']);
 
-  var bottomAxis = d3.axisBottom(xAxisScale).ticks(30);
-  var leftAxis = d3.axisLeft(yAxisScale);
+  var bottomAxis = d3.axisBottom(xAxisScale),
+  leftAxis = d3.axisLeft(yAxisScale).tickFormat(d3.timeFormat('%b')),
+  legendAxis = d3.axisBottom(legendAxisScale);
 
   var div = d3.select("body").append("div")
       .attr("class", "tooltip")
@@ -72,7 +80,7 @@ var createMap = function(data) {
 
   var map = d3.select('body').select('svg');
 
-  map.attr('height', height)
+  map.attr('height', height + 40)
   map.attr('width', width)
   map.style('background-color', 'white');
 
@@ -94,9 +102,9 @@ var createMap = function(data) {
     div.transition()
         .duration(5)
         .style("opacity", .9);
-    div.html(d.year + ' - ' + d.month + '</br>' + d.variance)
-        .style("left", (d3.event.pageX) + "px")
-        .style("top", (d3.event.pageY - 28) + "px");
+    div.html(d.year + ' - ' + d.month + '</br>' + d.variance + ' &#8451;</br>' + d.variance + data.baseTemperature + ' &#8451;')
+        .style("left", (d3.event.pageX + 5) + "px")
+        .style("top", (d3.event.pageY - 65) + "px");
   })
   .on("mouseout", function(d) {
     div.transition()
@@ -104,6 +112,21 @@ var createMap = function(data) {
         .style("opacity", 0);
   });
 
+  d3.select('body').select('svg').selectAll('.map')
+  .data(data.monthlyVariance).enter()
+  .append("g")
+  .append("rect")
+  .attr('x', function(d){return legendScale(d.variance) + 750})
+  .attr('y', 465)
+  .attr('width', 25)
+  .attr('height', '20px')
+  .style('fill', function(d){return color(d.variance)})
+
+  d3.select("body").select("svg")
+      .append("g")
+      .attr("width", 10)
+      .attr("transform", "translate(750, 485)")
+      .call(legendAxis)
 
   d3.select("body").select("svg")
       .append("g")
@@ -122,7 +145,7 @@ var createMap = function(data) {
     .attr("y", 30)
     .attr("text-anchor", "middle")
     .style("font-size", "16px")
-    .text("Heat Map");
+    .text("Monthly Global Land-Surface Temperature");
 
     d3.select("svg")
       .append("text")
@@ -133,8 +156,18 @@ var createMap = function(data) {
     d3.select("svg")
       .append("text")
       .attr("text-anchor", "middle")
-      .attr("transform", "translate(" + (width / 2 + 5) + ", 465)")
+      .attr("transform", "translate(" + (width / 2 + 5) + ", 470)")
       .text("Years");
+
+    d3.select("svg")
+      .append("text")
+      .attr("text-anchor", "middle")
+      .style("font-size", "8px")
+      .attr("transform", "translate(" + (width / 2 + 5) + ", 525)")
+      .html(function(){
+        return "*Temperatures are in Celsius and reported as anomalies relative to the Jan 1951-Dec 1980 average. Estimated Jan 1951-Dec 1980 absolute temperature &#8451;: 8.66 +/- 0.07."
+      })
+
 
 
 }
